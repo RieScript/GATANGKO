@@ -706,12 +706,28 @@ const SEED_VENDORS = [
 // id, vendor, English name, English note, Tagalog name, Tagalog note, price, unit, category, emoji
 const P = (id,vid,name,local,tl,tlSub,price,unit,cat,emoji) => ({id,vid,name,local,tl,tlSub,price,unit,cat,emoji,soldOut:false});
 const SEED_PRODUCTS = [
-  P('p1','v1','Tomatoes','Kamatis','Kamatis','Tomatoes',80,'kg','veg','🍅'),
-  P('p2','v1','Red onions','Sibuyas','Sibuyas','Red onions',140,'kg','veg','🧅'),
-  P('p3','v1','Garlic','Bawang','Bawang','Garlic',160,'kg','veg','🧄'),
-  P('p4','v1','Bitter gourd','Ampalaya','Ampalaya','Bitter gourd',100,'kg','veg','🥒'),
-  P('p5','v1','Pechay','Bok choy','Pechay','Bok choy',40,'bundle','veg','🥬'),
-  P('p6','v1','String beans','Sitaw','Sitaw','String beans',25,'bundle','veg','🫛'),
+  // Aling Nena's stall: the vegetables of "Bahay Kubo".
+  // Prices for kamatis, sibuyas, bawang, talong, sitaw, kalabasa and luya follow the DA Bantay Presyo
+  // weekly average (NCR markets, Oct 26 to Nov 1, 2026), rounded to the nearest peso.
+  // The others are not monitored by DA and are sample estimates to confirm at the San Fernando market.
+  P('p1','v1','Tomatoes','Kamatis','Kamatis','Tomatoes',100,'kg','veg','🍅'),
+  P('p2','v1','Red onions','Sibuyas','Sibuyas','Red onions',125,'kg','veg','🧅'),
+  P('p3','v1','Garlic (native)','Bawang','Bawang Tagalog','Native garlic',352,'kg','veg','🧄'),
+  P('p4','v1','Eggplant','Talong','Talong','Eggplant',100,'kg','veg','🍆'),
+  P('p5','v1','Mustard greens','Mustasa','Mustasa','Mustard greens',30,'bundle','veg','🥬'),
+  P('p6','v1','String beans','Sitaw','Sitaw','String beans',116,'kg','veg','🫛'),
+  P('p31','v1','Jicama','Singkamas','Singkamas','Jicama',60,'kg','veg','🥔'),
+  P('p32','v1','Winged beans','Sigarilyas','Sigarilyas','Winged beans',120,'kg','veg','🫛'),
+  P('p33','v1','Peanuts (raw)','Mani','Mani','Raw peanuts',160,'kg','veg','🥜'),
+  P('p34','v1','Hyacinth beans','Bataw','Bataw','Hyacinth beans',100,'kg','veg','🫛'),
+  P('p35','v1','Lima beans','Patani','Patani','Lima beans',140,'kg','veg','🫘'),
+  P('p36','v1','Winter melon','Kundol','Kundol','Winter melon',50,'kg','veg','🍈'),
+  P('p37','v1','Sponge gourd','Patola','Patola','Sponge gourd',80,'kg','veg','🥒'),
+  P('p38','v1','Bottle gourd','Upo','Upo','Bottle gourd',50,'pc','veg','🥒'),
+  P('p39','v1','Squash','Kalabasa','Kalabasa','Squash',61,'kg','veg','🎃'),
+  P('p40','v1','Radish','Labanos','Labanos','Radish',70,'kg','veg','🌱'),
+  P('p41','v1','Ginger','Luya','Luya','Ginger',196,'kg','veg','🫚'),
+  P('p42','v1','Sesame seeds','Linga','Linga','Sesame seeds',40,'100 g','veg','🌾'),
   P('p7','v2','Milkfish','Bangus','Bangus','Milkfish',180,'kg','fish','🐟'),
   P('p8','v2','Round scad','Galunggong','Galunggong','Round scad',220,'kg','fish','🐠'),
   P('p9','v2','Squid','Pusit','Pusit','Squid',320,'kg','fish','🦑'),
@@ -730,7 +746,7 @@ const SEED_PRODUCTS = [
   P('p22','v5','Bagnet','Crispy pork belly','Bagnet','Malutong na liempo',180,'250 g','deli','🥓'),
   P('p23','v5','Tupig','Grilled rice cake, pack of 5','Tupig','Inihaw na kakanin, 5 piraso',60,'pack','pasa','🍘'),
   P('p24','v5','Chichacorn','Crunchy garlic corn','Chichacorn','Malutong na mais na may bawang',90,'pack','pasa','🌽'),
-  P('p25','v5','Basi','Sugarcane wine','Basi','Alak mula sa tubo',220,'bottle','pasa','🍶'),
+  P('p25','v5','Basi','Sugarcane wine','Basi','Alak mula sa tubo',600,'bottle','pasa','🍶'),
   P('p26','v6','Dinorado rice','Premium','Bigas na dinorado','Premium',62,'kg','rice','🍚'),
   P('p27','v6','Well-milled rice','Everyday','Bigas na well-milled','Pang-araw-araw',50,'kg','rice','🍚'),
   P('p28','v6','Brown rice','Pinawa','Pinawa','Brown rice',70,'kg','rice','🌾'),
@@ -756,7 +772,13 @@ const REG_FEE = null; // set to a number (in pesos) once the City sets the regis
     phone:'09176543210', license:'BP-2026-01187', lease:'SFC-PM-L-0221', status:'pending', regBy:'vendor', feePaid:false, registeredAt: now - 2 * d});
 })();
 
-const UNITS = ['kg','pc','pack','bundle','bottle','250 g','dozen','tali'];
+// Show Aling Nena's vegetables in the order they are sung in "Bahay Kubo"
+const BAHAY_KUBO_ORDER = ['p31','p4','p32','p33','p6','p34','p35','p36','p37','p38','p39','p40','p5','p2','p1','p3','p41','p42'];
+BAHAY_KUBO_ORDER.forEach((id, i) => { const p = SEED_PRODUCTS.find(x => x.id === id); if (p) p.o = (i + 1) / 100; });
+const prodSortKey = p => (p.o != null ? p.o : (parseInt(String(p.id).replace(/\D/g, ''), 10) || 0));
+SEED_PRODUCTS.sort((a, b) => prodSortKey(a) - prodSortKey(b));
+
+const UNITS = ['kg','pc','pack','bundle','bottle','250 g','100 g','dozen','tali'];
 const WEIGHT_UNITS = ['kg'];
 const EMOJIS = ['🍅','🧅','🧄','🥬','🥒','🫛','🥕','🌶️','🍆','🥔','🐟','🦑','🦐','🦀','🦪','🥭','🍌','🍍','🍈','🥑','🍉','🥥','🥓','🍖','🍗','🥩','🥚','🌭','🍘','🌽','🍚','🫘'];
 const FEE_RATE = 0.02;
@@ -816,7 +838,7 @@ function seedOrders(){
   const tmr = isoDay(addDays(1)), d2 = isoDay(addDays(2));
   return [
     mk('MLS-1031','v1',[['p1',2],['p5',3],['p3',0.5]],'pickup','cash',3,'Carla Mendoza','09171234567',190),
-    mk('MLS-1034','v1',[['p2',1],['p6',4]],'delivery','gcash',1,'Joel Ancheta','09281112233',42,'25 Quezon Ave, Brgy. Catbangen'),
+    mk('MLS-1034','v1',[['p2',1],['p6',1]],'delivery','gcash',1,'Joel Ancheta','09281112233',42,'25 Quezon Ave, Brgy. Catbangen'),
     mk('MLS-1035','v1',[['p4',1.5],['p1',1]],'pickup','gcash',0,'Lea Flores','09065556677',8),
     mk('MLS-1038','v1',[['p1',5],['p2',3],['p3',1]],'pickup','cash',0,'Barangay II Fiesta Committee','09175550123',30,'',{date:tmr, slot:0}),
     mk('MLS-1032','v2',[['p7',2],['p10',1]],'pickup','cash',2,'Rico Dela Cruz','09179876543',75),
@@ -836,7 +858,7 @@ function seedThreads(){
   const now = Date.now(), m = 60000;
   const th = (vid, bk, bname, msgs, uv) => ({id: vid + ':' + bk, vid, bk, bname, msgs: msgs.map(([f, tx, ago], i) => ({k: 'm' + (now - ago * m).toString(36) + i, f, t: tx, ts: now - ago * m})), ub: 0, uv: uv || 0});
   return [
-    th('v1', 'joel-ancheta', 'Joel Ancheta', [['b','Hi po, may sitaw pa po ba bukas ng umaga?',95],['v','Meron po, Sir Joel. Ilang tali po?',90],['b','4 tali po. Salamat!',88]], 0),
+    th('v1', 'joel-ancheta', 'Joel Ancheta', [['b','Hi po, may sitaw pa po ba bukas ng umaga?',95],['v','Meron po, Sir Joel. Ilang kilo po?',90],['b','Isang kilo po. Salamat!',88]], 0),
     th('v1', 'lea-flores', 'Lea Flores', [['b','Pwede po bang hinog na kamatis ang piliin para sa order ko?',6]], 1),
     th('v2', 'surf-shack-cafe', 'Surf Shack Cafe', [['b','Good morning! Can we get 4 kg of bangus every Friday?',50]], 1)
   ];
@@ -846,6 +868,8 @@ function seedThreads(){
 const ME = store.get('buyerId', null) || ('b' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7));
 store.set('buyerId', ME);
 const msgKey = () => 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const SEED_VERSION = 3;
+if (store.get('seedv', 1) !== SEED_VERSION){ ['products','orders','vendors','threads','basket','seq'].forEach(k => { try { localStorage.removeItem('mlsf:' + k); } catch(e){} }); store.set('seedv', SEED_VERSION); }
 const S = {
   lang: store.get('lang', 'en'),
   mode: store.get('mode', null),
@@ -917,14 +941,15 @@ function fromRemote(col, map){
     if (col === 'orders'){ if (x.sched === undefined) x.sched = null; x.items = x.items || []; }
     if (col === 'vendors'){ x.story = x.story || {en:'', tl:''}; }
   });
-  if (col === 'products' || col === 'vendors') arr.sort((a, b) => idNum(a.id) - idNum(b.id));
+  if (col === 'products') arr.sort((a, b) => prodSortKey(a) - prodSortKey(b));
+  if (col === 'vendors') arr.sort((a, b) => idNum(a.id) - idNum(b.id));
   if (col === 'orders') arr.sort((a, b) => a.createdAt - b.createdAt);
   return arr;
 }
 const stable = v => Array.isArray(v) ? '[' + v.map(stable).join(',') + ']' : (v && typeof v === 'object') ? '{' + Object.keys(v).sort().filter(k => v[k] !== undefined).map(k => JSON.stringify(k) + ':' + stable(v[k])).join(',') + '}' : JSON.stringify(v === undefined ? null : v);
 const keyOf = item => stable(plain(item));
 function seedPayload(){
-  const out = {seq: 1040, meta: {seededAt: Date.now()}};
+  const out = {seq: 1040, meta: {seededAt: Date.now(), v: SEED_VERSION}};
   const data = {products: clone(SEED_PRODUCTS), orders: seedOrders(), vendors: clone(SEED_VENDORS), threads: seedThreads()};
   COLS.forEach(c => { out[c] = {}; data[c].forEach(it => { out[c][it.id] = toRemote(c, it); }); });
   return out;
@@ -992,7 +1017,13 @@ function startSync(){
   });
   SYNC.db.ref(ROOT).on('value', snap => {
     const val = snap.val();
-    if (!val || !val.meta){ SYNC.db.ref(ROOT).set(seedPayload()); return; }
+    if (val && val.meta && val.meta.v === 2){
+      // Version 3 only reorders the vegetables, so keep everyone's data and add the song order
+      const up = {}; up[ROOT + '/meta/v'] = SEED_VERSION;
+      SEED_PRODUCTS.forEach(p => { if (p.o != null && val.products && val.products[p.id]) up[ROOT + '/products/' + p.id + '/o'] = p.o; });
+      SYNC.db.ref().update(up); return;
+    }
+    if (!val || !val.meta || val.meta.v !== SEED_VERSION){ SYNC.db.ref(ROOT).set(seedPayload()); return; }
     SYNC.ready = true;
     applyRemote(val);
   }, err => console.warn('Sync listener error', err));
